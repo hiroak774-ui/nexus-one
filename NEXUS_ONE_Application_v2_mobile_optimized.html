@@ -145,6 +145,12 @@ textarea.form-control{height:74px;resize:none;font-size:15px;line-height:1.65;fo
 body:not(.light) .icon-btn{background:rgba(15,23,42,.45);border-color:rgba(148,163,184,.18)}
 body.light .icon-btn{background:rgba(255,255,255,.48);border-color:rgba(255,255,255,.72)}
 .icon-btn svg{width:20px;height:20px;stroke-width:2.1}
+.icon-btn.refresh-btn{transition:color .28s ease,background .28s ease,border-color .28s ease,box-shadow .28s ease,filter .28s ease,transform .28s ease}
+.icon-btn.refresh-btn svg{transition:filter .28s ease}
+.icon-btn.refresh-btn.is-refreshing{pointer-events:none;color:#dff7ff;background:rgba(56,189,248,.16);border-color:rgba(125,211,252,.46);box-shadow:0 0 0 1px rgba(125,211,252,.16),0 0 22px rgba(56,189,248,.36),0 14px 34px rgba(37,99,235,.18);filter:saturate(1.18)}
+.icon-btn.refresh-btn.is-refreshing svg{filter:drop-shadow(0 0 8px rgba(125,211,252,.95));animation:nexusRefreshSpin 1.65s linear infinite}
+@keyframes nexusRefreshSpin{to{transform:rotate(360deg)}}
+
 .header-spacer{width:42px;height:42px}
 .brand-head{justify-self:center;display:flex;align-items:center;justify-content:center;gap:10px;height:42px;padding:0 10px;border-radius:17px;box-sizing:border-box;background:rgba(255,255,255,.35);border:1px solid rgba(255,255,255,.48);backdrop-filter:blur(18px);position:relative;overflow:hidden}
 body:not(.light) .brand-head{background:rgba(15,23,42,.42);border-color:rgba(148,163,184,.18)}
@@ -341,7 +347,7 @@ body.light #logoParticleCanvas{opacity:.92}
     <div class="content" id="scrollArea">
       <div class="title-row">
         <div class="title"><h1>申請</h1><p>Application</p></div>
-        <div style="display:flex;gap:8px;align-items:center"><button class="month-display" id="monthValue" onclick="monthSheet()" style="border:0;background:transparent">2026<span class="dot">.</span>06</button><button class="icon-btn" onclick="refreshApplicationData()" aria-label="最新に更新"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 12a9 9 0 0 1-15.5 6.3"/><path d="M3 12a9 9 0 0 1 15.5-6.3"/><path d="M3 5v5h5"/><path d="M21 19v-5h-5"/></svg></button></div>
+        <div style="display:flex;gap:8px;align-items:center"><button class="month-display" id="monthValue" onclick="monthSheet()" style="border:0;background:transparent">2026<span class="dot">.</span>06</button><button class="icon-btn refresh-btn" id="applicationRefreshBtn" onclick="refreshApplicationData()" aria-label="最新に更新"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 12a9 9 0 0 1-15.5 6.3"/><path d="M3 12a9 9 0 0 1 15.5-6.3"/><path d="M3 5v5h5"/><path d="M21 19v-5h-5"/></svg></button></div>
       </div>
 
       <div class="status-strip">
@@ -804,7 +810,19 @@ async function loadApplicationData({force=false}={}){
     console.warn('[NEXUS ONE] application data fallback:', err);
   }
 }
-window.refreshApplicationData = function(){ return loadApplicationData({force:true}); };
+
+window.refreshApplicationData = async function(){
+  const btn = document.getElementById('applicationRefreshBtn');
+  if(btn?.classList.contains('is-refreshing')) return;
+  try{
+    btn?.classList.add('is-refreshing');
+    btn?.setAttribute('aria-busy','true');
+    await loadApplicationData({force:true});
+  } finally {
+    btn?.classList.remove('is-refreshing');
+    btn?.removeAttribute('aria-busy');
+  }
+};
 let requests = [];
 
 const statusLabels={ok:'承認済',wait:'承認待ち',draft:'下書き',back:'差戻し'};
