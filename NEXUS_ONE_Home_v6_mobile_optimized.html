@@ -2,15 +2,18 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <!-- NEXUS ONE PWA / Home Screen Settings -->
   <meta name="theme-color" content="#07152c">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="NEXUS ONE">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="apple-touch-icon" sizes="180x180" href="./nexus-one-icon-soft-180.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="./nexus-one-icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="./nexus-one-icon-512.png">
+
 
 <title>NEXUS ONE Home v4</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -760,32 +763,19 @@ body.dark .stat{
   grid-template-columns:repeat(4,1fr);
   align-items:center;
   z-index:5;
-  transition:
-    opacity 1s ease,
-    filter 1s ease,
-    background 1s ease,
-    border-color 1s ease,
-    box-shadow 1s ease;
-  opacity:0;
-  filter:blur(12px);
-  pointer-events:none;
+  opacity:1;
+  filter:blur(0);
+  pointer-events:auto;
+  transition:none;
 }
-.tabbar.show{
+.tabbar.show,.tabbar.hide{
   opacity:1;
   filter:blur(0);
   pointer-events:auto;
 }
-.tabbar.hide{
-  opacity:0;
-  filter:blur(12px);
-  pointer-events:none;
-  background:rgba(255,255,255,.08);
-  border-color:rgba(255,255,255,0);
-  box-shadow:none;
-}
 body.dark .tabbar.hide{
-  background:rgba(15,23,42,.04);
-  border-color:rgba(148,163,184,0);
+  background:var(--glass-strong);
+  border-color:var(--panel-border);
 }
 .tab{
   border:0;background:transparent;
@@ -1265,7 +1255,7 @@ body.dark .cancel-btn{background:rgba(255,255,255,.08)}
 
 </style>
 </head>
-<body class="nexus-page-enter">
+<body>
 <script>
 (function(){
   const savedTheme = localStorage.getItem('nexusTheme');
@@ -1274,10 +1264,20 @@ body.dark .cancel-btn{background:rgba(255,255,255,.08)}
 })();
 
 (function startHomePageTransition(){
+  let shouldIntro = false;
+  try {
+    shouldIntro = sessionStorage.getItem('nexusHomeIntro') === '1';
+    sessionStorage.removeItem('nexusHomeIntro');
+  } catch(e) {}
+  if(!shouldIntro) return;
+  document.body.classList.add('nexus-page-enter');
   window.requestAnimationFrame(() => {
     window.requestAnimationFrame(() => {
       document.body.classList.add('nexus-page-ready');
-      window.setTimeout(() => document.body.classList.remove('nexus-page-enter'), 760);
+      window.setTimeout(() => {
+        document.body.classList.remove('nexus-page-enter');
+        document.body.classList.remove('nexus-page-ready');
+      }, 760);
     });
   });
 })();

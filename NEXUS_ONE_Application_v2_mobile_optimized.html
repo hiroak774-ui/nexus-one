@@ -2,15 +2,18 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <!-- NEXUS ONE PWA / Home Screen Settings -->
   <meta name="theme-color" content="#07152c">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="NEXUS ONE">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="apple-touch-icon" sizes="180x180" href="./nexus-one-icon-soft-180.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="./nexus-one-icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="./nexus-one-icon-512.png">
+
 
 <title>NEXUS ONE Application v1</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -113,9 +116,7 @@ body.light .month-display{background:transparent;border:0;color:var(--ink)}
 .action-title{font-size:18px;font-weight:930;letter-spacing:-.03em}.action-sub{display:none}
 .arrow{justify-self:end;color:var(--cyan);font-size:24px;line-height:1;transition:transform .3s ease}
 .section-note{margin:0 6px;color:var(--muted);font-size:11px;font-weight:750;line-height:1.8}.section-note strong{color:var(--ink);font-weight:920}
-.tabbar{position:absolute;left:18px;right:18px;bottom:18px;height:70px;border-radius:28px;background:var(--glass-strong);border:1px solid var(--panel-border);backdrop-filter:blur(24px);box-shadow:0 22px 60px rgba(15,23,42,.14);display:grid;grid-template-columns:repeat(4,1fr);align-items:center;z-index:5;transition:opacity 1s ease,filter 1s ease,background 1s ease,border-color 1s ease,box-shadow 1s ease;opacity:0;filter:blur(12px);pointer-events:none}
-.tabbar.show{opacity:1;filter:blur(0);pointer-events:auto}.tabbar.hide{opacity:0;filter:blur(12px);pointer-events:none;background:rgba(255,255,255,.08);border-color:rgba(255,255,255,0);box-shadow:none}body:not(.light) .tabbar.hide{background:rgba(15,23,42,.04);border-color:rgba(148,163,184,0)}
-.tab{border:0;background:transparent;height:58px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#94a3b8;font-size:10px;font-weight:800}.tab svg{width:21px;height:21px;stroke-width:2.05}.tab.active{color:#38bdf8}body.light .tab.active{color:#2563eb}
+.tabbar{position:absolute;left:18px;right:18px;bottom:18px;height:70px;border-radius:28px;background:var(--glass-strong);border:1px solid var(--panel-border);backdrop-filter:blur(24px);box-shadow:0 22px 60px rgba(15,23,42,.14);display:grid;grid-template-columns:repeat(4,1fr);align-items:center;z-index:5;opacity:1;filter:blur(0);pointer-events:auto;transition:none}.tabbar.show,.tabbar.hide{opacity:1;filter:blur(0);pointer-events:auto}body:not(.light) .tabbar.hide{background:var(--glass-strong);border-color:var(--panel-border)}.tab{border:0;background:transparent;height:58px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#94a3b8;font-size:10px;font-weight:800}.tab svg{width:21px;height:21px;stroke-width:2.05}.tab.active{color:#38bdf8}body.light .tab.active{color:#2563eb}
 .sheet-backdrop{position:absolute;inset:0;z-index:8;background:rgba(15,23,42,.08);backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity .58s ease,backdrop-filter .58s ease}.sheet-backdrop.show{opacity:1;pointer-events:auto}
 .sheet{position:absolute;left:14px;right:14px;bottom:14px;z-index:9;max-height:86%;overflow:hidden;border-radius:30px 30px 36px 36px;background:rgba(15,23,42,.76);border:1px solid rgba(148,163,184,.18);box-shadow:0 -24px 70px rgba(15,23,42,.18);backdrop-filter:blur(28px);padding:16px;opacity:0;filter:blur(14px);transform:translateY(10px) scale(.985);pointer-events:none;transition:opacity .72s ease,filter .72s ease,transform .72s cubic-bezier(.18,.92,.22,1)}
 body.light .sheet{background:rgba(255,255,255,.78);border-color:rgba(255,255,255,.70)}.sheet.show{opacity:1;filter:blur(0);transform:translateY(0) scale(1);pointer-events:auto}.sheet.confirm-pop{animation:confirmPop .62s cubic-bezier(.18,.92,.22,1) both}.sheet.soft-pop{animation:softSheet .48s cubic-bezier(.18,.92,.22,1) both}@keyframes confirmPop{0%{opacity:.35;filter:blur(18px);transform:translateY(12px) scale(.982)}100%{opacity:1;filter:blur(0);transform:translateY(0) scale(1)}}@keyframes softSheet{0%{filter:blur(10px);transform:translateY(8px) scale(.992)}100%{filter:blur(0);transform:translateY(0) scale(1)}}
@@ -916,7 +917,7 @@ function goAppPage(fileName){
 }
 
 const tabbar=document.getElementById('tabbar'); let tabTimer;
-function showTabbar(){ tabbar.classList.add('show'); tabbar.classList.remove('hide'); clearTimeout(tabTimer); tabTimer=setTimeout(()=>{tabbar.classList.add('hide'); tabbar.classList.remove('show');},2600); }
+function showTabbar(){ tabbar.classList.add('show'); tabbar.classList.remove('hide'); }
 ['mousemove','touchstart','scroll','keydown'].forEach(ev=>document.addEventListener(ev,showTabbar,{passive:true})); setTimeout(showTabbar,400);
 </script>
 </body>

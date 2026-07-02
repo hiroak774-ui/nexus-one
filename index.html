@@ -8,9 +8,12 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="NEXUS ONE">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="apple-touch-icon" sizes="180x180" href="./nexus-one-icon-soft-180.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="./nexus-one-icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="./nexus-one-icon-512.png">
+
 
   <title>NEXUS ONE | App Entry</title>
 <style>
@@ -794,6 +797,9 @@
     }
 
     function redirectTo(pageKey, params = {}) {
+      if (pageKey === 'home') {
+        try { sessionStorage.setItem('nexusHomeIntro', '1'); } catch (e) {}
+      }
       const base = PAGES[pageKey] || PAGES.login;
       const query = new URLSearchParams();
       Object.entries(params || {}).forEach(([key, value]) => {
