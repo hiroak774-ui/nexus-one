@@ -149,7 +149,7 @@ body.light .icon-btn{background:rgba(255,255,255,.48);border-color:rgba(255,255,
 .icon-btn.refresh-btn svg{transition:filter .28s ease}
 .icon-btn.refresh-btn.is-refreshing{pointer-events:none;color:#dff7ff;background:rgba(56,189,248,.16);border-color:rgba(125,211,252,.46);box-shadow:0 0 0 1px rgba(125,211,252,.16),0 0 22px rgba(56,189,248,.36),0 14px 34px rgba(37,99,235,.18);filter:saturate(1.18)}
 .icon-btn.refresh-btn.is-refreshing svg{filter:drop-shadow(0 0 8px rgba(125,211,252,.95));animation:nexusRefreshSpin 1.65s linear infinite}
-@keyframes nexusRefreshSpin{to{transform:rotate(360deg)}}
+@keyframes nexusRefreshSpin{to{transform:rotate(-360deg)}}
 
 .header-spacer{width:42px;height:42px}
 .brand-head{justify-self:center;display:flex;align-items:center;justify-content:center;gap:10px;height:42px;padding:0 10px;border-radius:17px;box-sizing:border-box;background:rgba(255,255,255,.35);border:1px solid rgba(255,255,255,.48);backdrop-filter:blur(18px);position:relative;overflow:hidden}
@@ -331,6 +331,13 @@ body.light #logoParticleCanvas{opacity:.92}
   .sheet.request-mode textarea.form-control{height:82px !important; min-height:82px !important;}
 }
 
+</style>
+
+<style id="nexus-bottom-space-unifier">
+  :root { --nexus-bottom-scroll-space: calc(96px + env(safe-area-inset-bottom)); }
+  .content, .screen-content, .page-content, .main-content {
+    padding-bottom: var(--nexus-bottom-scroll-space) !important;
+  }
 </style>
 </head>
 <body>

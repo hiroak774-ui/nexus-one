@@ -1254,6 +1254,13 @@ body.dark .cancel-btn{background:rgba(255,255,255,.08)}
 }
 
 </style>
+
+<style id="nexus-bottom-space-unifier">
+  :root { --nexus-bottom-scroll-space: calc(96px + env(safe-area-inset-bottom)); }
+  .content, .screen-content, .page-content, .main-content {
+    padding-bottom: var(--nexus-bottom-scroll-space) !important;
+  }
+</style>
 </head>
 <body>
 <script>

@@ -243,6 +243,13 @@ body.light #logoParticleCanvas{opacity:.92}
 }
 
 </style>
+
+<style id="nexus-bottom-space-unifier">
+  :root { --nexus-bottom-scroll-space: calc(96px + env(safe-area-inset-bottom)); }
+  .content, .screen-content, .page-content, .main-content {
+    padding-bottom: var(--nexus-bottom-scroll-space) !important;
+  }
+</style>
 </head>
 <body>
 <main class="phone">
