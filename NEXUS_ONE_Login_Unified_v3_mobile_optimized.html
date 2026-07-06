@@ -594,9 +594,17 @@ function transitionTo(url){
 }
 
 function resolveApprovedDestination(employeeId){
-  const direct = params.get('redirect');
-  if(direct === 'home') return `${HOME_URL}?employeeId=${encodeURIComponent(employeeId)}`;
+  // NEXUS ONEの入口は必ず index.html に統一する。
+  // index.html 側で承認済みならHOME、未登録/承認待ちなら初期登録へ振り分ける。
   return `${APP_ENTRY_URL}?employeeId=${encodeURIComponent(employeeId)}`;
+}
+
+function transitionToEntry(paramsObj = {}){
+  const query = new URLSearchParams();
+  Object.entries(paramsObj).forEach(([key, value]) => {
+    if(value !== undefined && value !== null && String(value) !== '') query.set(key, value);
+  });
+  transitionTo(`${APP_ENTRY_URL}${query.toString() ? '?' + query.toString() : ''}`);
 }
 
 async function handleLogin(source='email'){
@@ -626,19 +634,20 @@ async function handleLogin(source='email'){
     }
     if(user.pending){
       if(user.employeeId || email) saveUser(user.employeeId, user.email || email);
-      setStatus('承認待ちです。申請状況画面へ移動します。', 'warning');
-      const query = new URLSearchParams();
-      if(user.employeeId) query.set('employeeId', user.employeeId);
-      if(user.email || email) query.set('email', user.email || email);
-      query.set('status', 'pending');
-      transitionTo(`${INITIAL_SETUP_URL}?${query.toString()}`);
+      setStatus('承認待ちです。NEXUS ONEを起動します。', 'warning');
+      transitionToEntry({
+        employeeId: user.employeeId,
+        email: user.email || email,
+        status: 'pending'
+      });
       return;
     }
     if(user.unregistered || !user.employeeId){
-      setStatus('未登録のため、初回登録へ移動します。', 'warning');
-      const query = new URLSearchParams();
-      if(user.email || email) query.set('email', user.email || email);
-      transitionTo(`${INITIAL_SETUP_URL}${query.toString() ? '?' + query.toString() : ''}`);
+      setStatus('未登録のため、NEXUS ONEを起動します。', 'warning');
+      transitionToEntry({
+        email: user.email || email,
+        status: 'not_registered'
+      });
       return;
     }
     setStatus('ログイン状態を確認できませんでした。管理者へ確認してください。', 'error');

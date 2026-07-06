@@ -502,7 +502,23 @@
         });
     }
 
+    function normalizeEntryStatus(data) {
+      const root = data && (data.data || data.result || data.user || data.employee || data) || {};
+      const statusRaw = String(data.status || root.status || data.userStatus || root.userStatus || '').toLowerCase();
+      const registrationStatus = data.registrationStatus || root.registrationStatus || data['登録ステータス'] || root['登録ステータス'] || '';
+      const accountStatus = data.accountStatus || root.accountStatus || data['アカウント状態'] || root['アカウント状態'] || '';
+      const employeeId = data.employeeId || root.employeeId || data['社員ID'] || root['社員ID'] || '';
+      const email = data.email || root.email || root.mail || data['Googleメールアドレス'] || root['Googleメールアドレス'] || '';
+      let status = statusRaw;
+      if (registrationStatus === '承認済' || ['approved','active','ok'].includes(statusRaw)) status = 'approved';
+      else if (registrationStatus === '承認待ち' || registrationStatus === '申請中' || ['pending','waiting','approval_pending'].includes(statusRaw)) status = 'pending';
+      else if (['unregistered','not_registered','not_found','notfound','none'].includes(statusRaw)) status = 'not_registered';
+      else if (accountStatus === '無効' || ['disabled','inactive','suspended'].includes(statusRaw)) status = 'inactive';
+      return { ...data, ...root, status, employeeId, email };
+    }
+
     function handleStatus(data) {
+      data = normalizeEntryStatus(data || {});
       const status = data.status;
       const employeeId = data.employeeId || '';
 
