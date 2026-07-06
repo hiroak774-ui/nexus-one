@@ -10,7 +10,7 @@
   <meta name="apple-mobile-web-app-title" content="NEXUS ONE">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="apple-touch-icon" sizes="180x180" href="./nexus-one-icon-soft-180.png">
-<title>NEXUS ONE Login Unified v2</title>
+<title>NEXUS ONE Login Google Only v4</title>
 <style>
 :root{
   --ink:#e5f0ff;
@@ -257,6 +257,23 @@ h1{
   box-shadow:0 1px 2px rgba(60,64,67,.10),0 10px 22px rgba(15,23,42,.12);
 }
 .google:active{transform:translateY(1px) scale(.992)}
+.google-render{
+  width:100%;
+  min-height:44px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+.google-render > div{
+  max-width:100%;
+}
+.google-only-card .note{
+  margin-bottom:18px;
+}
+.google-fallback{
+  margin-top:0;
+}
+
 .g{
   width:20px;
   height:20px;
@@ -424,6 +441,7 @@ h1{
 }
 
 </style>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 <main class="phone">
@@ -441,22 +459,15 @@ h1{
       <p class="copy">人と業務を、ひとつにつなぐ。</p>
     </div>
 
-    <div class="login-card">
-      <p class="note">初回利用・端末変更・再認証時に使用します。</p>
-      <div class="input-group">
-        <label class="input-label" for="emailInput">MAIL ADDRESS</label>
-        <input id="emailInput" class="email-input" type="email" inputmode="email" autocomplete="email" placeholder="name@example.com">
-      </div>
-      <button class="primary" id="loginBtn">
-        <span id="loginLabel">メールアドレスで確認</span>
-      </button>
-      <div class="divider">OR</div>
-      <button class="google" id="googleBtn">
-        <svg class="g" viewBox="0 0 18 18" aria-hidden="true">
-          <path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62z"/>
-          <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.8.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.03-3.7H.96v2.33A9 9 0 0 0 9 18z"/>
-          <path fill="#FBBC05" d="M3.97 10.72a5.41 5.41 0 0 1 0-3.44V4.95H.96A9 9 0 0 0 .96 13.05l3.01-2.33z"/>
-          <path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.46.9 11.43 0 9 0A9 9 0 0 0 .96 4.95l3.01 2.33C4.68 5.16 6.66 3.58 9 3.58z"/>
+    <div class="login-card google-only-card">
+      <p class="note">Googleアカウントでログインしてください。</p>
+      <div class="google-render" id="googleButtonSlot"></div>
+      <button class="google google-fallback" id="googleFallbackBtn" type="button" style="display:none">
+        <svg class="g" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.91c1.7-1.57 2.69-3.88 2.69-6.62Z"/>
+          <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.91-2.26c-.81.54-1.84.86-3.05.86-2.34 0-4.33-1.58-5.04-3.71H.96v2.33A9 9 0 0 0 9 18Z"/>
+          <path fill="#FBBC05" d="M3.96 10.71a5.41 5.41 0 0 1 0-3.42V4.96H.96a9 9 0 0 0 0 8.08l3-2.33Z"/>
+          <path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.43 1.35l2.59-2.59C13.46.88 11.43 0 9 0A9 9 0 0 0 .96 4.96l3 2.33C4.67 5.16 6.66 3.58 9 3.58Z"/>
         </svg>
         Googleでログイン
       </button>
@@ -469,28 +480,20 @@ h1{
 
 <script>
 const GAS_API_URL = localStorage.getItem('nexusGasApiUrl') || 'https://script.google.com/macros/s/AKfycbwiV9vLacv8se1UVdGhhKuoWkSlsNReRJOUIgT494XUMBNUKBOxMhkzXLsvHRdCfWIt/exec';
+const GOOGLE_CLIENT_ID = '34622774291-c5kf0e7br87703eisj1k4leh4n6fdj0d.apps.googleusercontent.com';
 const APP_ENTRY_URL = 'index.html';
 const HOME_URL = 'NEXUS_ONE_Home_v6_mobile_optimized.html';
 const INITIAL_SETUP_URL = 'NEXUS_ONE_Initial_Setup_Unified_v3_mobile_optimized.html';
 const STORAGE_KEYS = ['nexusEmployeeId','nexusCurrentEmployeeId','employeeId'];
 const EMAIL_KEYS = ['nexusUserEmail','nexusLoginEmail'];
+const NAME_KEYS = ['nexusUserName','nexusLoginName'];
 
 const params = new URLSearchParams(location.search);
-const emailInput = document.getElementById('emailInput');
-const loginBtn = document.getElementById('loginBtn');
-const googleBtn = document.getElementById('googleBtn');
-const loginLabel = document.getElementById('loginLabel');
+const googleButtonSlot = document.getElementById('googleButtonSlot');
+const googleFallbackBtn = document.getElementById('googleFallbackBtn');
 const statusText = document.getElementById('statusText');
-
-function getStoredEmployeeId(){
-  const fromUrl = params.get('employeeId') || params.get('eid') || '';
-  if(fromUrl) return fromUrl.trim();
-  for(const key of STORAGE_KEYS){
-    const value = sessionStorage.getItem(key) || localStorage.getItem(key);
-    if(value) return value.trim();
-  }
-  return '';
-}
+let googleReady = false;
+let googleInitialized = false;
 
 function setStatus(message, type=''){
   statusText.textContent = message || '';
@@ -498,19 +501,18 @@ function setStatus(message, type=''){
 }
 
 function setBusy(isBusy){
-  loginBtn.disabled = isBusy;
-  googleBtn.disabled = isBusy;
-  loginLabel.innerHTML = isBusy ? '<span class="loading-dot"></span> 確認中' : 'メールアドレスで確認';
+  if(googleFallbackBtn) googleFallbackBtn.disabled = isBusy;
+  if(googleButtonSlot) googleButtonSlot.classList.toggle('is-busy', !!isBusy);
 }
 
 function clearSavedUser(){
-  [...STORAGE_KEYS, ...EMAIL_KEYS].forEach(key => {
+  [...STORAGE_KEYS, ...EMAIL_KEYS, ...NAME_KEYS].forEach(key => {
     localStorage.removeItem(key);
     sessionStorage.removeItem(key);
   });
 }
 
-function saveUser(employeeId, email){
+function saveUser(employeeId, email, name){
   if(employeeId){
     STORAGE_KEYS.forEach(key => {
       localStorage.setItem(key, employeeId);
@@ -523,22 +525,29 @@ function saveUser(employeeId, email){
       sessionStorage.setItem(key, email);
     });
   }
+  if(name){
+    NAME_KEYS.forEach(key => {
+      localStorage.setItem(key, name);
+      sessionStorage.setItem(key, name);
+    });
+  }
 }
 
 function normalizeStatus(data){
   const root = data && (data.data || data.result || data.user || data.employee || data);
   const employee = (data && (data.employee || data.user)) || root || {};
   const employeeId = data?.employeeId || root?.employeeId || root?.['社員ID'] || employee?.employeeId || employee?.['社員ID'] || '';
-  const email = data?.email || root?.email || root?.mail || root?.['Googleメールアドレス'] || employee?.email || employee?.['Googleメールアドレス'] || emailInput.value.trim();
+  const email = data?.email || root?.email || root?.mail || root?.['Googleメールアドレス'] || employee?.email || employee?.['Googleメールアドレス'] || '';
+  const name = data?.name || root?.name || root?.displayName || root?.['氏名'] || employee?.name || employee?.['氏名'] || '';
   const registrationStatus = data?.registrationStatus || root?.registrationStatus || root?.['登録ステータス'] || employee?.registrationStatus || employee?.['登録ステータス'] || '';
   const accountStatus = data?.accountStatus || root?.accountStatus || root?.['アカウント状態'] || employee?.accountStatus || employee?.['アカウント状態'] || '';
   const status = String(data?.status || root?.status || data?.userStatus || root?.userStatus || '').toLowerCase();
   const approved = data?.approved === true || root?.approved === true || registrationStatus === '承認済' || ['approved','active','ok'].includes(status);
   const pending = data?.pending === true || root?.pending === true || registrationStatus === '承認待ち' || registrationStatus === '申請中' || ['pending','waiting','approval_pending'].includes(status);
-  const unregistered = data?.registered === false || root?.registered === false || data?.exists === false || root?.exists === false || ['unregistered','not_found','notfound','none'].includes(status);
+  const unregistered = data?.registered === false || root?.registered === false || data?.exists === false || root?.exists === false || ['unregistered','not_registered','not_found','notfound','none'].includes(status);
   const disabled = data?.active === false || root?.active === false || accountStatus === '無効' || ['disabled','inactive','suspended'].includes(status);
   const ok = data?.ok !== false && data?.success !== false;
-  return { ok, employeeId, email, registrationStatus, accountStatus, approved, pending, unregistered, disabled, raw:data };
+  return { ok, employeeId, email, name, registrationStatus, accountStatus, approved, pending, unregistered, disabled, raw:data };
 }
 
 async function requestByFetch(payload){
@@ -553,14 +562,14 @@ async function requestByFetch(payload){
 
 function requestByJsonp(payload){
   return new Promise((resolve,reject) => {
-    const callbackName = 'nexusLoginCallback_' + Date.now() + '_' + Math.random().toString(16).slice(2);
+    const callbackName = 'nexusGoogleLoginCallback_' + Date.now() + '_' + Math.random().toString(16).slice(2);
     const url = new URL(GAS_API_URL);
     Object.entries(payload).forEach(([key,value]) => {
       if(value !== undefined && value !== null && value !== '') url.searchParams.set(key, value);
     });
     url.searchParams.set('callback', callbackName);
     const script = document.createElement('script');
-    const timer = setTimeout(() => { cleanup(); reject(new Error('timeout')); }, 12000);
+    const timer = setTimeout(() => { cleanup(); reject(new Error('timeout')); }, 15000);
     function cleanup(){
       clearTimeout(timer);
       delete window[callbackName];
@@ -573,11 +582,11 @@ function requestByJsonp(payload){
   });
 }
 
-async function callCheckUserStatus({ email='', employeeId='' }){
+async function callMobileGoogleLogin(credential){
   if(GAS_API_URL.includes('PASTE_NEW_GAS_DEPLOYMENT_ID_HERE')){
     throw new Error('gas-url-not-set');
   }
-  const payload = { action:'checkUserStatus', email, employeeId };
+  const payload = { action:'mobileGoogleLogin', credential };
   try{
     return await requestByFetch(payload);
   }catch(err){
@@ -594,60 +603,51 @@ function transitionTo(url){
 }
 
 function resolveApprovedDestination(employeeId){
-  // NEXUS ONEの入口は必ず index.html に統一する。
-  // index.html 側で承認済みならHOME、未登録/承認待ちなら初期登録へ振り分ける。
+  const direct = params.get('redirect');
+  if(direct === 'home') return `${HOME_URL}?employeeId=${encodeURIComponent(employeeId)}`;
   return `${APP_ENTRY_URL}?employeeId=${encodeURIComponent(employeeId)}`;
 }
 
-function transitionToEntry(paramsObj = {}){
-  const query = new URLSearchParams();
-  Object.entries(paramsObj).forEach(([key, value]) => {
-    if(value !== undefined && value !== null && String(value) !== '') query.set(key, value);
-  });
-  transitionTo(`${APP_ENTRY_URL}${query.toString() ? '?' + query.toString() : ''}`);
-}
-
-async function handleLogin(source='email'){
-  const email = emailInput.value.trim();
-  const employeeId = getStoredEmployeeId();
-  if(!email && !employeeId){
-    setStatus('メールアドレスを入力してください。', 'warning');
-    emailInput.focus();
+async function handleGoogleCredential(response){
+  const credential = response && response.credential;
+  if(!credential){
+    setStatus('Google認証情報を取得できませんでした。', 'error');
     return;
   }
   setBusy(true);
-  setStatus(source === 'google' ? 'Googleログイン情報を確認しています。' : '登録状況を確認しています。');
+  setStatus('Googleアカウントを確認しています。');
   try{
-    const data = await callCheckUserStatus({ email, employeeId });
+    const data = await callMobileGoogleLogin(credential);
     const user = normalizeStatus(data);
-    if(!user.ok) throw new Error('api');
+    if(!user.ok) throw new Error(data?.message || 'api');
     if(user.disabled){
       clearSavedUser();
       setStatus('このアカウントは無効です。管理者へ確認してください。', 'error');
       return;
     }
     if(user.approved && user.employeeId){
-      saveUser(user.employeeId, user.email || email);
+      saveUser(user.employeeId, user.email, user.name);
       setStatus('認証しました。NEXUS ONEを起動します。', 'success');
       transitionTo(resolveApprovedDestination(user.employeeId));
       return;
     }
     if(user.pending){
-      if(user.employeeId || email) saveUser(user.employeeId, user.email || email);
-      setStatus('承認待ちです。NEXUS ONEを起動します。', 'warning');
-      transitionToEntry({
-        employeeId: user.employeeId,
-        email: user.email || email,
-        status: 'pending'
-      });
+      if(user.employeeId || user.email) saveUser(user.employeeId, user.email, user.name);
+      setStatus('承認待ちです。申請状況画面へ移動します。', 'warning');
+      const query = new URLSearchParams();
+      if(user.employeeId) query.set('employeeId', user.employeeId);
+      if(user.email) query.set('email', user.email);
+      if(user.name) query.set('name', user.name);
+      query.set('status', 'pending');
+      transitionTo(`${INITIAL_SETUP_URL}?${query.toString()}`);
       return;
     }
     if(user.unregistered || !user.employeeId){
-      setStatus('未登録のため、NEXUS ONEを起動します。', 'warning');
-      transitionToEntry({
-        email: user.email || email,
-        status: 'not_registered'
-      });
+      setStatus('未登録のため、初回登録へ移動します。', 'warning');
+      const query = new URLSearchParams();
+      if(user.email) query.set('email', user.email);
+      if(user.name) query.set('name', user.name);
+      transitionTo(`${INITIAL_SETUP_URL}${query.toString() ? '?' + query.toString() : ''}`);
       return;
     }
     setStatus('ログイン状態を確認できませんでした。管理者へ確認してください。', 'error');
@@ -655,34 +655,76 @@ async function handleLogin(source='email'){
     if(err.message === 'gas-url-not-set'){
       setStatus('GAS API URLが未設定です。デプロイURLを設定してください。', 'error');
     }else{
-      setStatus('接続に失敗しました。時間をおいて再度お試しください。', 'error');
+      setStatus(err.message || '接続に失敗しました。時間をおいて再度お試しください。', 'error');
     }
   }finally{
     setBusy(false);
   }
 }
 
-loginBtn.addEventListener('click', () => handleLogin('email'));
-emailInput.addEventListener('keydown', e => {
-  if(e.key === 'Enter') handleLogin('email');
-});
-googleBtn.addEventListener('click', () => {
-  setStatus('本番ではGoogle認証後のメールで確認します。現在はメール入力で確認してください。');
-  if(emailInput.value.trim()) handleLogin('google');
-  else emailInput.focus();
-});
+function initGoogleLogin(retry=0){
+  if(!GOOGLE_CLIENT_ID){
+    setStatus('Google Client IDが未設定です。', 'error');
+    return;
+  }
+  if(!(window.google && google.accounts && google.accounts.id)){
+    if(retry < 40){
+      setTimeout(() => initGoogleLogin(retry + 1), 180);
+    }else{
+      setStatus('Googleログインの読み込みに失敗しました。ページを再読み込みしてください。', 'error');
+      if(googleFallbackBtn) googleFallbackBtn.style.display = 'flex';
+    }
+    return;
+  }
+  if(googleInitialized) return;
+  googleInitialized = true;
+  googleReady = true;
+  try{
+    google.accounts.id.initialize({
+      client_id: GOOGLE_CLIENT_ID,
+      callback: handleGoogleCredential,
+      auto_select: false,
+      cancel_on_tap_outside: true
+    });
+    google.accounts.id.renderButton(googleButtonSlot, {
+      theme: 'outline',
+      size: 'large',
+      type: 'standard',
+      shape: 'pill',
+      text: 'signin_with',
+      logo_alignment: 'left',
+      width: Math.min(320, Math.max(260, googleButtonSlot.offsetWidth || 300)),
+      locale: 'ja'
+    });
+    setStatus('');
+  }catch(err){
+    setStatus('Googleログインを表示できませんでした。', 'error');
+    if(googleFallbackBtn) googleFallbackBtn.style.display = 'flex';
+  }
+}
+
+if(googleFallbackBtn){
+  googleFallbackBtn.addEventListener('click', () => {
+    if(!(window.google && google.accounts && google.accounts.id)){
+      setStatus('Googleログインの読み込み中です。少し待ってから再度お試しください。', 'warning');
+      return;
+    }
+    if(!googleInitialized) initGoogleLogin();
+    setStatus('Googleアカウントを選択してください。');
+    google.accounts.id.prompt(notification => {
+      if(notification && notification.isNotDisplayed && notification.isNotDisplayed()){
+        setStatus('Googleログイン画面を表示できませんでした。ブラウザ設定をご確認ください。', 'error');
+      }
+    });
+  });
+}
+
 (function init(){
   if(params.get('clear') === '1'){
     clearSavedUser();
-    setStatus('保存済みの社員IDをクリアしました。', 'success');
+    setStatus('保存済みのログイン情報をクリアしました。', 'success');
   }
-  const email = params.get('email') || localStorage.getItem('nexusUserEmail') || localStorage.getItem('nexusLoginEmail') || '';
-  if(email) emailInput.value = email;
-  const employeeIdFromUrl = params.get('employeeId') || params.get('eid');
-  if(employeeIdFromUrl){
-    setStatus('社員IDから再認証します。');
-    setTimeout(() => handleLogin('employeeId'), 450);
-  }
+  initGoogleLogin();
 })();
 </script>
 
